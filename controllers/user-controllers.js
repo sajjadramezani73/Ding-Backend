@@ -120,7 +120,6 @@ const login = async (req, res, next) => {
 const updeteUser = async (req, res, next) => {
     const { id, firstName, lastName, gender } = req.body
 
-
     let existingUser
     try {
         existingUser = await User.findOne({ _id: id })
