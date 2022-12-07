@@ -9,6 +9,7 @@ const userSchema = new Schema({
     avatar: { type: String, required: false },
     gender: { type: String, required: true },
     hasAvatar: { type: Number, required: true },
+    comments: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Comment' }]
 })
 
 module.exports = mongoose.model('User', userSchema)
