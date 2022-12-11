@@ -1,11 +1,12 @@
 const Comment = require("../model/comment")
 const User = require("../model/user")
 const HttpError = require('../model/http-error')
+const moment = require('jalali-moment');
 
 const getComments = async (req, res, next) => {
     let comments
     try {
-        comments = await Comment.find()
+        comments = await Comment.find().populate('user')
     } catch (err) {
         const error = new HttpError('Getting comment faild', 500)
         return next(error)
@@ -14,14 +15,7 @@ const getComments = async (req, res, next) => {
 }
 
 const createComment = async (req, res, next) => {
-    const { title, description, score, creator } = req.body
-
-    const createComment = new Comment({
-        title: title,
-        description: description,
-        score: score,
-        user: creator
-    })
+    const { title, comment, score, creator } = req.body
 
     let user
     try {
@@ -34,6 +28,14 @@ const createComment = async (req, res, next) => {
         res.status(422).json({ success: 0, message: 'کاربری با این آی دی یافت نشد' })
         return next()
     }
+
+    const createComment = new Comment({
+        title: title,
+        comment: comment,
+        score: score,
+        created_at: moment().locale('fa').format('YYYY/M/D HH:mm:ss'),
+        user: creator
+    })
 
     try {
         await createComment.save()
