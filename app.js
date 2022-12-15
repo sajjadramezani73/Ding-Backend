@@ -7,6 +7,7 @@ const bodyParser = require('body-parser')
 const userRoutes = require('./routes/user-routes')
 const configRoutes = require('./routes/config-routes')
 const commentRoutes = require('./routes/comment-routes')
+const entryAndExitRoutes = require('./routes/entryAndExit-routes')
 
 const app = express()
 app.use(bodyParser.json())
@@ -22,6 +23,7 @@ app.use((req, res, next) => {
 app.use('/api/users', userRoutes)
 app.use('/api/application', configRoutes)
 app.use('/api/comments', commentRoutes)
+app.use('/api/entry-and-exit', entryAndExitRoutes)
 
 app.use((error, req, res, next) => {
     if (req.file) {
