@@ -63,4 +63,32 @@ const saveEntryAndExit = async (req, res, next) => {
     res.json({ success: 1, message: 'درخواست شما با موفقیت ثبت شد' })
 }
 
+const reportEntryAndExit = async (req, res, next) => {
+    const { creator, date } = req.body
+
+    const changeDate = (date) => {
+        let m = moment.from(date, 'fa', 'YYYY/M/D')
+        return m.locale('fa').format('YYYY/M')
+    }
+
+    let reports = []
+    let existingEntryAndExit
+    try {
+        existingEntryAndExit = await EntryAndExit.find({ user: creator }).exec()
+    } catch (err) {
+        const error = new HttpError('finding entry and exit faild', 500)
+        return next(error)
+    }
+
+    if (!existingEntryAndExit) {
+        res.status(422).json({ success: 0, reports: reports })
+        return next()
+    }
+
+    reports = existingEntryAndExit.filter(item => changeDate(item.date) === date)
+
+    res.json({ reports: reports })
+}
+
 exports.saveEntryAndExit = saveEntryAndExit
+exports.reportEntryAndExit = reportEntryAndExit
