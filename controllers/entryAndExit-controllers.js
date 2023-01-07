@@ -64,7 +64,7 @@ const saveEntryAndExit = async (req, res, next) => {
 }
 
 const reportEntryAndExit = async (req, res, next) => {
-    const { creator, date } = req.body
+    const { creator, date, mode } = req.body
 
     const changeDate = (date) => {
         let m = moment.from(date, 'fa', 'YYYY/M/D')
@@ -85,7 +85,13 @@ const reportEntryAndExit = async (req, res, next) => {
         return next()
     }
 
-    reports = existingEntryAndExit.filter(item => changeDate(item.date) === date)
+    reportsFiltered = existingEntryAndExit.filter(item => changeDate(item.date) === date)
+
+    if (mode === 'summary-report') {
+        reports = {}
+    } else if (mode === 'detailed-report') {
+        reports = reportsFiltered
+    }
 
     res.json({ reports: reports })
 }
