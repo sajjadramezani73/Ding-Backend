@@ -6,7 +6,7 @@ const saveEntryAndExit = async (req, res, next) => {
     const { creator, mode, lat, lng } = req.body
 
     const date = moment().locale('fa').format('YYYY/M/D')
-    const time = moment().locale('fa').format('HH:mm:ss')
+    const time = moment().locale('fa').format('HH:mm')
 
     let existingEntryAndExit
     try {
@@ -27,7 +27,7 @@ const saveEntryAndExit = async (req, res, next) => {
             user: creator,
             date: date,
             lastMode: mode,
-            entryAndExit: [{ lat: lat, lng: lng, mode: mode, time: time }]
+            entryAndExit: [{ [mode]: { lat: lat, lng: lng, mode: mode, time: time } }]
         })
 
         try {
@@ -49,7 +49,15 @@ const saveEntryAndExit = async (req, res, next) => {
         return next()
     }
 
-    const entryAndExit = { lat: lat, lng: lng, mode: mode, time: time }
+    let entryAndExit
+    if (mode == 'enter') {
+        entryAndExit = { [mode]: { lat: lat, lng: lng, mode: mode, time: time } }
+    }
+    if (mode == 'exit') {
+        entryAndExit = existingEntryAndExit.entryAndExit[existingEntryAndExit.entryAndExit.length - 1]
+        entryAndExit[mode] = { lat: lat, lng: lng, mode: mode, time: time }
+        existingEntryAndExit.entryAndExit.pop()
+    }
 
     try {
         existingEntryAndExit.lastMode = mode
