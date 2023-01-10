@@ -6,7 +6,7 @@ const saveEntryAndExit = async (req, res, next) => {
     const { creator, mode, lat, lng } = req.body
 
     const date = moment().locale('fa').format('YYYY/M/D')
-    const time = moment().locale('fa').format('HH:mm')
+    const time = moment().locale('fa').format('HH:mm:ss')
 
     let existingEntryAndExit
     try {
