@@ -8,6 +8,33 @@ const saveEntryAndExit = async (req, res, next) => {
     const date = moment().locale('fa').format('YYYY/M/D')
     const time = moment().locale('fa').format('HH:mm:ss')
 
+    // function for totalTime each report 
+    const calculationTimeFunc = (arr) => {
+        let hours = 0
+        let minutes = 0
+        let seconds = 0
+        const newArr = arr.filter(item => Object.keys(item).length == 2)
+        newArr.map(item => {
+            const enterTime = moment(item.enter.time, 'HH:mm:ss')
+            const exitTime = moment(item.exit.time, 'HH:mm:ss')
+
+            hours += moment.duration(exitTime.diff(enterTime)).get('hours')
+            minutes += moment.duration(exitTime.diff(enterTime)).get('minutes')
+            seconds += moment.duration(exitTime.diff(enterTime)).get('seconds')
+        })
+
+        if (seconds >= 60) {
+            minutes += (seconds - seconds % 60) / 60
+            seconds = seconds % 60
+        }
+        if (minutes >= 60) {
+            hours += (minutes - minutes % 60) / 60
+            minutes = minutes % 60
+        }
+
+        return `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`
+    }
+
     let existingEntryAndExit
     try {
         existingEntryAndExit = await EntryAndExit.findOne({ user: creator, date: date })
@@ -27,7 +54,8 @@ const saveEntryAndExit = async (req, res, next) => {
             user: creator,
             date: date,
             lastMode: mode,
-            entryAndExit: [{ [mode]: { lat: lat, lng: lng, mode: mode, time: time } }]
+            entryAndExit: [{ [mode]: { lat: lat, lng: lng, mode: mode, time: time } }],
+            totalTime: ''
         })
 
         try {
@@ -62,6 +90,7 @@ const saveEntryAndExit = async (req, res, next) => {
     try {
         existingEntryAndExit.lastMode = mode
         existingEntryAndExit.entryAndExit.push(entryAndExit)
+        existingEntryAndExit.totalTime = calculationTimeFunc(existingEntryAndExit.entryAndExit)
         await existingEntryAndExit.save()
     } catch (err) {
         const error = new HttpError('Creating entry and exit faild', 500)
