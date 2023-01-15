@@ -108,6 +108,29 @@ const reportEntryAndExit = async (req, res, next) => {
         return m.locale('fa').format('YYYY/M')
     }
 
+    // function for total_working_hours each month 
+    const calculationAllTimeFunc = (arr) => {
+        let hours = 0
+        let minutes = 0
+        let seconds = 0
+        arr.map(item => {
+            hours += Number(item.totalTime.split(":")[0])
+            minutes += Number(item.totalTime.split(":")[1])
+            seconds += Number(item.totalTime.split(":")[2])
+        })
+
+        if (seconds >= 60) {
+            minutes += (seconds - seconds % 60) / 60
+            seconds = seconds % 60
+        }
+        if (minutes >= 60) {
+            hours += (minutes - minutes % 60) / 60
+            minutes = minutes % 60
+        }
+
+        return `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`
+    }
+
     let reports = []
     let existingEntryAndExit
     try {
@@ -125,7 +148,14 @@ const reportEntryAndExit = async (req, res, next) => {
     reportsFiltered = existingEntryAndExit.filter(item => changeDate(item.date) === date)
 
     if (mode === 'summary-report') {
-        reports = {}
+        const reportsObj = {
+            total_shift_hours: '00:00:00',
+            total_working_hours: calculationAllTimeFunc(reportsFiltered),
+            total_delay_hours: '00:00:00',
+            total_rush_hours: '00:00:00',
+            totla_leave_days: 0
+        }
+        reports = reportsObj
     } else if (mode === 'detailed-report') {
         reports = reportsFiltered
     }
