@@ -113,7 +113,8 @@ const reportEntryAndExit = async (req, res, next) => {
         let hours = 0
         let minutes = 0
         let seconds = 0
-        arr.map(item => {
+        const newArr = arr.filter(item => item.totalTime !== '')
+        newArr.map(item => {
             hours += Number(item.totalTime.split(":")[0])
             minutes += Number(item.totalTime.split(":")[1])
             seconds += Number(item.totalTime.split(":")[2])
