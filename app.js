@@ -38,7 +38,8 @@ app.use((error, req, res, next) => {
     res.json({ message: error.message || 'Error' })
 })
 
-mongoose.connect('mongodb://127.0.0.1:27017/ding')
+// mongoose.connect('mongodb://127.0.0.1:27017/ding')
+mongoose.connect('mongodb+srv://sajjad-ramezani:sajjad1234@ding-clone.b6rtc4b.mongodb.net/ding?retryWrites=true&w=majority')
     .then(() => {
         app.listen(5000)
     })
